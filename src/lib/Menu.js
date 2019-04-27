@@ -797,6 +797,16 @@ export default class FranzMenu {
         type: 'separator',
       });
 
+    menu.push({
+      label: "Show Franz",
+      accelerator: `${cmdKey}+${1}`,
+      type: 'radio',
+      checked: false,
+      click: () => {
+        _electron.remote.app.mainWindow.show();
+      }
+    });
+
     services.allDisplayed.forEach((service, i) => (menu.push({
       label: this._getServiceName(service),
       accelerator: i < 9 ? `${cmdKey}+${i + 2}` : null,
@@ -806,16 +816,6 @@ export default class FranzMenu {
         this.actions.service.setActive({ serviceId: service.id });
       },
     })));
-
-    menu.unshift({
-      label: "Show Franz",
-      accelerator: `${_environment.cmdKey}+${1}`,
-      type: 'radio',
-      checked: false,
-      click: () => {
-        _electron.remote.app.mainWindow.show();
-      }
-    });
 
     return menu;
   }
