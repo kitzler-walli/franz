@@ -119,9 +119,9 @@ export default class AppStore extends Store {
     setInterval(() => this._systemDND(), ms('5s'));
 
     // Check for updates once every 4 hours
-    setInterval(() => this._checkForUpdates(), CHECK_INTERVAL);
+    //setInterval(() => this._checkForUpdates(), CHECK_INTERVAL);
     // Check for an update in 30s (need a delay to prevent Squirrel Installer lock file issues)
-    setTimeout(() => this._checkForUpdates(), ms('30s'));
+    //setTimeout(() => this._checkForUpdates(), ms('30s'));
     ipcRenderer.on('autoUpdate', (event, data) => {
       if (data.available) {
         this.updateStatus = this.updateStatusTypes.AVAILABLE;
@@ -260,13 +260,13 @@ export default class AppStore extends Store {
 
   @action _checkForUpdates() {
     this.updateStatus = this.updateStatusTypes.CHECKING;
-    ipcRenderer.send('autoUpdate', { action: 'check' });
+    //ipcRenderer.send('autoUpdate', { action: 'check' });
 
     this.actions.recipe.update();
   }
 
   @action _installUpdate() {
-    ipcRenderer.send('autoUpdate', { action: 'install' });
+    //ipcRenderer.send('autoUpdate', { action: 'install' });
   }
 
   @action _resetUpdateStatus() {

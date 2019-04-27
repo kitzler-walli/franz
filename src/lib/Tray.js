@@ -31,7 +31,15 @@ export default class TrayIcon {
       }, {
         label: 'Quit Franz',
         click() {
-          app.quit();
+          if(_electron.dialog.showMessageBox({
+            type: 'question',
+            title: 'Really quit?',
+            message: 'Really want to close Franz?',
+            defaultId: 0,
+            buttons: ['Cancel', 'Yes']
+          }) == 1){
+            _electron.app.quit();
+          }
         },
       },
     ];

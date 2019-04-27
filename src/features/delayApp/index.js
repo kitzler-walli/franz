@@ -49,23 +49,23 @@ export default function init(stores) {
             return;
           }
 
-          const diff = moment().diff(timeLastDelay);
-          if ((stores.app.isFocused && diff >= config.delayOffset) || !shownAfterLaunch) {
-            debug(`App will be delayed for ${config.delayDuration / 1000}s`);
+          //const diff = moment().diff(timeLastDelay);
+          // if ((stores.app.isFocused && diff >= config.delayOffset) || !shownAfterLaunch) {
+          //   debug(`App will be delayed for ${config.delayDuration / 1000}s`);
 
-            setVisibility(true);
-            gaPage('/delayApp');
-            gaEvent('DelayApp', 'show', 'Delay App Feature');
+          //   setVisibility(true);
+          //   gaPage('/delayApp');
+          //   gaEvent('DelayApp', 'show', 'Delay App Feature');
 
-            timeLastDelay = moment();
-            shownAfterLaunch = true;
+          //   timeLastDelay = moment();
+          //   shownAfterLaunch = true;
 
-            setTimeout(() => {
-              debug('Resetting app delay');
+          //   setTimeout(() => {
+          //     debug('Resetting app delay');
 
-              setVisibility(false);
-            }, DEFAULT_FEATURES_CONFIG.needToWaitToProceedConfig.wait + 1000); // timer needs to be able to hit 0
-          }
+          //     setVisibility(false);
+          //   }, DEFAULT_FEATURES_CONFIG.needToWaitToProceedConfig.wait + 1000); // timer needs to be able to hit 0
+          // }
         });
       } else {
         setVisibility(false);

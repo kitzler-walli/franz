@@ -48,8 +48,8 @@ export const DEFAULT_FEATURES_CONFIG = {
   isSpellcheckerPremiumFeature: false,
   needToWaitToProceed: false,
   needToWaitToProceedConfig: {
-    delayOffset: ms('1h'),
-    wait: ms('10s'),
+    delayOffset: 10,
+    wait: 10,
   },
   isServiceProxyEnabled: false,
   isServiceProxyPremiumFeature: true,

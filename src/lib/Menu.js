@@ -594,19 +594,19 @@ export default class FranzMenu {
     tpl[1].submenu.push({
       type: 'separator',
     }, {
-      label: intl.formatMessage(menuItems.toggleDevTools),
-      accelerator: `${cmdKey}+Alt+I`,
-      click: (menuItem, browserWindow) => {
-        browserWindow.webContents.toggleDevTools();
-      },
-    }, {
-      label: intl.formatMessage(menuItems.toggleServiceDevTools),
-      accelerator: `${cmdKey}+Shift+Alt+I`,
-      click: () => {
-        this.actions.service.openDevToolsForActiveService();
-      },
-      enabled: this.stores.user.isLoggedIn && this.stores.services.enabled.length > 0,
-    });
+        label: intl.formatMessage(menuItems.toggleDevTools),
+        accelerator: `${cmdKey}+Alt+I`,
+        click: (menuItem, browserWindow) => {
+          browserWindow.webContents.toggleDevTools();
+        },
+      }, {
+        label: intl.formatMessage(menuItems.toggleServiceDevTools),
+        accelerator: `${cmdKey}+Shift+Alt+I`,
+        click: () => {
+          this.actions.service.openDevToolsForActiveService();
+        },
+        enabled: this.stores.user.isLoggedIn && this.stores.services.enabled.length > 0,
+      });
 
     tpl[1].submenu.unshift({
       label: intl.formatMessage(menuItems.reloadService),
@@ -621,12 +621,12 @@ export default class FranzMenu {
         }
       },
     }, {
-      label: intl.formatMessage(menuItems.reloadFranz),
-      accelerator: `${cmdKey}+Shift+R`,
-      click: () => {
-        window.location.reload();
-      },
-    });
+        label: intl.formatMessage(menuItems.reloadFranz),
+        accelerator: `${cmdKey}+Shift+R`,
+        click: () => {
+          window.location.reload();
+        },
+      });
 
     tpl.unshift({
       label: isMac ? app.getName() : intl.formatMessage(menuItems.file),
@@ -778,34 +778,44 @@ export default class FranzMenu {
         this.actions.ui.openSettings({ path: 'recipes' });
       },
     }, {
-      type: 'separator',
-    }, {
-      label: intl.formatMessage(menuItems.activateNextService),
-      accelerator: `${cmdKey}+alt+right`,
-      click: () => this.actions.service.setActiveNext(),
-    }, {
-      label: intl.formatMessage(menuItems.activatePreviousService),
-      accelerator: `${cmdKey}+alt+left`,
-      click: () => this.actions.service.setActivePrev(),
-    }, {
-      label: intl.formatMessage(
-        settings.all.app.isAppMuted ? menuItems.unmuteApp : menuItems.muteApp,
-      ).replace('&', '&&'),
-      accelerator: `${cmdKey}+shift+m`,
-      click: () => this.actions.app.toggleMuteApp(),
-    }, {
-      type: 'separator',
-    });
+        type: 'separator',
+      }, {
+        label: intl.formatMessage(menuItems.activateNextService),
+        accelerator: `${cmdKey}+alt+right`,
+        click: () => this.actions.service.setActiveNext(),
+      }, {
+        label: intl.formatMessage(menuItems.activatePreviousService),
+        accelerator: `${cmdKey}+alt+left`,
+        click: () => this.actions.service.setActivePrev(),
+      }, {
+        label: intl.formatMessage(
+          settings.all.app.isAppMuted ? menuItems.unmuteApp : menuItems.muteApp,
+        ).replace('&', '&&'),
+        accelerator: `${cmdKey}+shift+m`,
+        click: () => this.actions.app.toggleMuteApp(),
+      }, {
+        type: 'separator',
+      });
 
     services.allDisplayed.forEach((service, i) => (menu.push({
       label: this._getServiceName(service),
-      accelerator: i < 9 ? `${cmdKey}+${i + 1}` : null,
+      accelerator: i < 9 ? `${cmdKey}+${i + 2}` : null,
       type: 'radio',
       checked: service.isActive,
       click: () => {
         this.actions.service.setActive({ serviceId: service.id });
       },
     })));
+
+    menu.unshift({
+      label: "Show Franz",
+      accelerator: `${_environment.cmdKey}+${1}`,
+      type: 'radio',
+      checked: false,
+      click: () => {
+        _electron.remote.app.mainWindow.show();
+      }
+    });
 
     return menu;
   }
@@ -838,8 +848,8 @@ export default class FranzMenu {
       },
       enabled: this.stores.user.isLoggedIn,
     }, {
-      type: 'separator',
-    });
+        type: 'separator',
+      });
 
     // Default workspace
     menu.push({
