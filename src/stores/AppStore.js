@@ -8,6 +8,9 @@ import AutoLaunch from 'auto-launch';
 import prettyBytes from 'pretty-bytes';
 import ms from 'ms';
 import { URL } from 'url';
+import os from 'os';
+import path from 'path';
+import { readJsonSync } from 'fs-extra';
 
 import Store from './lib/Store';
 import Request from './lib/Request';
@@ -23,7 +26,7 @@ import { isValidExternalURL } from '../helpers/url-helpers';
 
 const debug = require('debug')('Franz:AppStore');
 
-const { app, systemPreferences } = remote;
+const { app, systemPreferences, screen } = remote;
 
 const mainWindow = remote.getCurrentWindow();
 
@@ -91,6 +94,7 @@ export default class AppStore extends Store {
       this._offlineCheck.bind(this),
       this._setLocale.bind(this),
       this._muteAppHandler.bind(this),
+      this._handleFullScreen.bind(this),
     ]);
   }
 
@@ -182,6 +186,26 @@ export default class AppStore extends Store {
     return prettyBytes(this.getAppCacheSizeRequest.execute().result || 0);
   }
 
+  @computed get debugInfo() {
+    return {
+      host: {
+        platform: process.platform,
+        release: os.release(),
+        screens: screen.getAllDisplays(),
+      },
+      franz: {
+        version: app.getVersion(),
+        electron: process.versions.electron,
+        installedRecipes: this.stores.recipes.all.map(recipe => ({ id: recipe.id, version: recipe.version })),
+        devRecipes: this.stores.recipePreviews.dev.map(recipe => ({ id: recipe.id, version: recipe.version })),
+        services: this.stores.services.all.map(service => ({ id: service.id, recipe: service.recipe.id })),
+        workspaces: this.stores.workspaces.workspaces.map(workspace => ({ id: workspace.id, services: workspace.services })),
+        windowSettings: readJsonSync(path.join(app.getPath('userData'), 'window-state.json')),
+        user: this.stores.user.data.id,
+      },
+    };
+  }
+
   // Actions
   @action _notify({
     title, options, notificationId, serviceId = null,
@@ -189,7 +213,7 @@ export default class AppStore extends Store {
     if (this.stores.settings.all.app.isAppMuted) return;
 
     // TODO: is there a simple way to use blobs for notifications without storing them on disk?
-    if (options.icon.startsWith('blob:')) {
+    if (options.icon && options.icon.startsWith('blob:')) {
       delete options.icon;
     }
 
@@ -334,6 +358,8 @@ export default class AppStore extends Store {
       this.locale = this._getDefaultLocale();
     }
 
+    moment.locale(this.locale);
+
     debug(`Set locale to "${this.locale}"`);
   }
 
@@ -351,6 +377,16 @@ export default class AppStore extends Store {
 
     if (!showMessageBadgesEvenWhenMuted) {
       this.actions.app.setBadge({ unreadDirectMessageCount: 0, unreadIndirectMessageCount: 0 });
+    }
+  }
+
+  _handleFullScreen() {
+    const body = document.querySelector('body');
+
+    if (this.isFullScreen) {
+      body.classList.add('isFullScreen');
+    } else {
+      body.classList.remove('isFullScreen');
     }
   }
 

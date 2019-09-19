@@ -1,3 +1,113 @@
+# [5.3.3](https://github.com/meetfranz/franz/compare/v5.3.1...v5.3.3) (2019-09-17)
+
+### Features
+* **Todos:** Highlight Franz Todos icon in sidebar when the Franz Todos panel is opened ([7431ba3](https://github.com/meetfranz/franz/commit/7431ba3))
+
+
+### Bug Fixes
+
+* **Spellchecker:** Fix disabling spellchecker after app start ([4035043](https://github.com/meetfranz/franz/commit/4035043))
+* **Windows:** Fix window menu to get overwritten by Todos menu ([aa33ac7](https://github.com/meetfranz/franz/commit/aa33ac7))
+
+
+### General
+
+* **Translations:** Improved translations. **[A million thanks to the amazing community. 🎉](http://i18n.meetfranz.com/)**
+
+
+# [5.3.2](https://github.com/meetfranz/franz/compare/v5.3.1...v5.3.2) (2019-09-12)
+
+
+### Features
+
+* **Todos:** Move Franz Todos to sidebar ([7ffcf8c](https://github.com/meetfranz/franz/commit/7ffcf8c))
+* **Workspaces:** Add setting to keep all services in workspaces in background (avoid reload) ([@Wouter0100](https://github.com/Wouter0100)) ([ddab3a8](https://github.com/meetfranz/franz/commit/ddab3a8))
+
+
+### Bug Fixes
+
+* **Settings:** Don't toggle Franz Todos on general settings changes ([@vantezzen](https://github.com/vantezzen)) ([a99371b](https://github.com/meetfranz/franz/commit/a99371b))
+
+
+### General
+
+* **Translations:** Improved translations. **[A million thanks to the amazing community. 🎉](http://i18n.meetfranz.com/)**
+
+
+
+# [5.3.1](https://github.com/meetfranz/franz/compare/v5.3.0...v5.3.1) (2019-09-06)
+
+### Features
+
+* **App:** Add second confirmation step for the free 14 day trial.
+* **Todos:** Add option to disable todos ([5d03b91](https://github.com/meetfranz/franz/commit/5d03b91))
+
+# [5.3.0](https://github.com/meetfranz/franz/compare/v5.2.1-beta.1...v5.3.0) (2019-09-06)
+
+### Features
+
+* **Todos:** 🥳🥳🥳 Manage your daily tasks with **Franz Todos** 🥳🥳🥳
+* **App:** Add option to copy debug information via the help menu ([4666e85](https://github.com/meetfranz/franz/commit/4666e85))
+* **App:** Updated Pricing, more infos can be found on  ([meetfranz.com/pricing](https://meetfranz.com/pricing))
+* **App:** Improved Settings UX
+* **3rd Party Services:** Added option to open custom recipes folder
+
+
+### Bug Fixes
+
+* **Windows:** Fix app size in fullscreen ([e210701](https://github.com/meetfranz/franz/commit/e210701))
+* **Windows:** Fix app to be cropped at the bottom on Windows ([42f97b4](https://github.com/meetfranz/franz/commit/42f97b4))
+* **Notifications:** Fix issue that blocked notifications from e.g. Slack ([44c413b](https://github.com/meetfranz/franz/commit/44c413b))
+* **App:** A ton of various bugfixes and improvements
+
+### General
+
+* **Translations:** Improved translations. **[A million thanks to the amazing community. 🎉](http://i18n.meetfranz.com/)**
+
+
+# [5.2.0](https://github.com/meetfranz/franz/compare/v5.2.0-beta.4...v5.2.0) (2019-07-19)
+
+### Features
+* **Service:** You can now add any custom website 🥳
+
+### Bug Fixes
+
+* **Notifications:** Don't show notification badges when app is muted ([e844a64](https://github.com/meetfranz/franz/commit/e844a64))
+* **Settings:** Fix position of settings window
+* **Recipes:** Fix recipe install when directly accessing recipe e.g. via url ([eba50bc](https://github.com/meetfranz/franz/commit/eba50bc))
+* **Proxy:** Fix issue with service proxy authentication ([b9e5b23](https://github.com/meetfranz/franz/commit/b9e5b23))
+* **Announcements:** Fix issue with rendering announcements in workspaces ([1e38ec5](https://github.com/meetfranz/franz/commit/1e38ec5))
+* **Windows:** Add Workspaces menu & fix Window menu ([92a61d4](https://github.com/meetfranz/franz/commit/92a61d4))
+* **Windows:** Replace tray icon with high-res version ([a5eb399](https://github.com/meetfranz/franz/commit/a5eb399))
+* **Workspaces:** Fix service reordering within workspaces ([17f3a22](https://github.com/meetfranz/franz/commit/17f3a22))
+* **Workspaces:** Fix issue with service visibility after downgrade ([05294](https://github.com/meetfranz/franz/commit/05294))
+
+### General
+* **App:** Improved email validation ([dd8ddcc](https://github.com/meetfranz/franz/commit/dd8ddcc)) ([@Snuggle](https://github.com/Snuggle))
+* **App:** Update electron to 4.2.4 ([404c87a](https://github.com/meetfranz/franz/commit/404c87a))
+* **Translations:** Improved translations. **[A million thanks to the amazing community. 🎉](http://i18n.meetfranz.com/)**
+
+
+# [5.2.0-beta.4](https://github.com/meetfranz/franz/compare/v5.2.0-beta.3...v5.2.0-beta.4) (2019-07-01)
+
+
+### Bug Fixes
+
+* **Notifications:** Don't show notification badges when app is muted ([e844a64](https://github.com/meetfranz/franz/commit/e844a64))
+* **Settings:** Fix position of settings window
+
+### General
+
+* **Translations:** Improved translations. **[A million thanks to the amazing community. 🎉](http://i18n.meetfranz.com/)**
+
+
+# [5.2.0-beta.3](https://github.com/meetfranz/franz/compare/v5.2.0-beta.2...v5.2.0-beta.3) (2019-06-24)
+
+### General
+
+* **App:** Downgraded electron to 4.2.4 ([404c87a](https://github.com/meetfranz/franz/commit/404c87a))
+
+
 # [5.2.0-beta.2](https://github.com/meetfranz/franz/compare/v5.2.0-beta.1...v5.2.0-beta.2) (2019-06-12)
 
 

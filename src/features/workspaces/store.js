@@ -79,7 +79,7 @@ export default class WorkspacesStore extends FeatureStore {
 
   // ========== PUBLIC API ========= //
 
-  start(stores, actions) {
+  @action start(stores, actions) {
     debug('WorkspacesStore::start');
     this.stores = stores;
     this.actions = actions;
@@ -97,6 +97,7 @@ export default class WorkspacesStore extends FeatureStore {
       [workspaceActions.update, this._update],
       [workspaceActions.activate, this._setActiveWorkspace],
       [workspaceActions.deactivate, this._deactivateActiveWorkspace],
+      [workspaceActions.toggleKeepAllWorkspacesLoadedSetting, this._toggleKeepAllWorkspacesLoadedSetting],
     ]);
     this._allActions = this._freeUserActions.concat(this._premiumUserActions);
     this._registerActions(this._allActions);
@@ -104,7 +105,7 @@ export default class WorkspacesStore extends FeatureStore {
     // REACTIONS
 
     this._freeUserReactions = createReactions([
-      this._stopPremiumActionsAndReactions,
+      this._disablePremiumFeatures,
       this._openDrawerWithSettingsReaction,
       this._setFeatureEnabledReaction,
       this._setIsPremiumFeatureReaction,
@@ -123,15 +124,19 @@ export default class WorkspacesStore extends FeatureStore {
     this.isFeatureActive = true;
   }
 
-  stop() {
-    super.stop();
-    debug('WorkspacesStore::stop');
-    this.isFeatureActive = false;
+  @action reset() {
     this.activeWorkspace = null;
     this.nextWorkspace = null;
     this.workspaceBeingEdited = null;
     this.isSwitchingWorkspace = false;
     this.isWorkspaceDrawerOpen = false;
+  }
+
+  @action stop() {
+    super.stop();
+    debug('WorkspacesStore::stop');
+    this.reset();
+    this.isFeatureActive = false;
   }
 
   filterServicesByActiveWorkspace = (services) => {
@@ -241,6 +246,10 @@ export default class WorkspacesStore extends FeatureStore {
     await updateWorkspaceRequest.execute(activeWorkspace);
   };
 
+  _toggleKeepAllWorkspacesLoadedSetting = async () => {
+    this._updateSettings({ keepAllWorkspacesLoaded: !this.settings.keepAllWorkspacesLoaded });
+  };
+
   // Reactions
 
   _setFeatureEnabledReaction = () => {
@@ -249,11 +258,10 @@ export default class WorkspacesStore extends FeatureStore {
   };
 
   _setIsPremiumFeatureReaction = () => {
-    const { features, user } = this.stores;
-    const { isPremium } = user.data;
-    const { isWorkspacePremiumFeature } = features.features;
-    this.isPremiumFeature = isWorkspacePremiumFeature;
-    this.isPremiumUpgradeRequired = isWorkspacePremiumFeature && !isPremium;
+    const { features } = this.stores;
+    const { isWorkspaceIncludedInCurrentPlan } = features.features;
+    this.isPremiumFeature = !isWorkspaceIncludedInCurrentPlan;
+    this.isPremiumUpgradeRequired = !isWorkspaceIncludedInCurrentPlan;
   };
 
   _setWorkspaceBeingEditedReaction = () => {
@@ -281,6 +289,7 @@ export default class WorkspacesStore extends FeatureStore {
   };
 
   _activateLastUsedWorkspaceReaction = () => {
+    debug('_activateLastUsedWorkspaceReaction');
     if (!this.activeWorkspace && this.userHasWorkspaces) {
       const { lastActiveWorkspace } = this.settings;
       if (lastActiveWorkspace) {
@@ -324,10 +333,12 @@ export default class WorkspacesStore extends FeatureStore {
     });
   };
 
-  _stopPremiumActionsAndReactions = () => {
+  _disablePremiumFeatures = () => {
     if (!this.isUserAllowedToUseFeature) {
+      debug('_disablePremiumFeatures');
       this._stopActions(this._premiumUserActions);
       this._stopReactions(this._premiumUserReactions);
+      this.reset();
     } else {
       this._startActions(this._premiumUserActions);
       this._startReactions(this._premiumUserReactions);
