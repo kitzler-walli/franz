@@ -10,6 +10,7 @@ import { announcementActions } from '../features/announcements/actions';
 import { announcementsStore } from '../features/announcements';
 import { GA_CATEGORY_TODOS, todosStore } from '../features/todos';
 import { todoActions } from '../features/todos/actions';
+import { CUSTOM_WEBSITE_ID } from '../features/webControls/constants';
 
 const { app, Menu, dialog } = remote;
 
@@ -113,6 +114,10 @@ const menuItems = defineMessages({
   reloadFranz: {
     id: 'menu.view.reloadFranz',
     defaultMessage: '!!!Reload Franz',
+  },
+  reloadTodos: {
+    id: 'menu.view.reloadTodos',
+    defaultMessage: '!!!Reload ToDos',
   },
   minimize: {
     id: 'menu.window.minimize',
@@ -262,6 +267,10 @@ const menuItems = defineMessages({
     id: 'menu.todos.enableTodos',
     defaultMessage: '!!!Enable Todos',
   },
+  serviceGoHome: {
+    id: 'menu.services.goHome',
+    defaultMessage: '!!!Home',
+  },
 });
 
 function getActiveWebview() {
@@ -302,6 +311,9 @@ const _templateFactory = intl => [
         label: intl.formatMessage(menuItems.pasteAndMatchStyle),
         accelerator: 'Cmd+Shift+V',
         selector: 'pasteAndMatchStyle:',
+        click() {
+          getActiveWebview().pasteAndMatchStyle();
+        },
       },
       {
         label: intl.formatMessage(menuItems.delete),
@@ -332,10 +344,10 @@ const _templateFactory = intl => [
         accelerator: 'Cmd+plus',
         click() {
           const activeService = getActiveWebview();
-          activeService.getZoomLevel((level) => {
-            // level 9 =~ +300% and setZoomLevel wouldnt zoom in further
-            if (level < 9) activeService.setZoomLevel(level + 1);
-          });
+          const level = activeService.getZoomLevel();
+
+          // level 9 =~ +300% and setZoomLevel wouldnt zoom in further
+          if (level < 9) activeService.setZoomLevel(level + 1);
         },
       },
       {
@@ -343,10 +355,10 @@ const _templateFactory = intl => [
         accelerator: 'Cmd+-',
         click() {
           const activeService = getActiveWebview();
-          activeService.getZoomLevel((level) => {
-            // level -9 =~ -50% and setZoomLevel wouldnt zoom out further
-            if (level > -9) activeService.setZoomLevel(level - 1);
-          });
+          const level = activeService.getZoomLevel();
+
+          // level -9 =~ -50% and setZoomLevel wouldnt zoom out further
+          if (level > -9) activeService.setZoomLevel(level - 1);
         },
       },
       {
@@ -507,10 +519,10 @@ const _titleBarTemplateFactory = intl => [
         accelerator: `${ctrlKey}+=`,
         click() {
           const activeService = getActiveWebview();
-          activeService.getZoomLevel((level) => {
-            // level 9 =~ +300% and setZoomLevel wouldnt zoom in further
-            if (level < 9) activeService.setZoomLevel(level + 1);
-          });
+          const level = activeService.getZoomLevel();
+
+          // level 9 =~ +300% and setZoomLevel wouldnt zoom in further
+          if (level < 9) activeService.setZoomLevel(level + 1);
         },
       },
       {
@@ -518,10 +530,10 @@ const _titleBarTemplateFactory = intl => [
         accelerator: `${ctrlKey}+-`,
         click() {
           const activeService = getActiveWebview();
-          activeService.getZoomLevel((level) => {
-            // level -9 =~ -50% and setZoomLevel wouldnt zoom out further
-            if (level > -9) activeService.setZoomLevel(level - 1);
-          });
+          const level = activeService.getZoomLevel();
+
+          // level -9 =~ -50% and setZoomLevel wouldnt zoom out further
+          if (level > -9) activeService.setZoomLevel(level - 1);
         },
       },
       {
@@ -628,7 +640,9 @@ export default class FranzMenu {
     // need to clone object so we don't modify computed (cached) object
     const serviceTpl = Object.assign([], this.serviceTpl());
 
-    if (window.franz === undefined) {
+    // Don't initialize when window.franz is undefined or when we are on a payment window route
+    if (window.franz === undefined || this.stores.router.location.pathname.startsWith('/payment/')) {
+      console.log('skipping menu init');
       return;
     }
 
@@ -657,8 +671,8 @@ export default class FranzMenu {
         label: intl.formatMessage(menuItems.toggleTodosDevTools),
         accelerator: `${cmdKey}+Shift+Alt+O`,
         click: () => {
-          const webview = document.querySelector('webview[partition="persist:todos"]');
-          if (webview) webview.openDevTools();
+          const webview = document.querySelector('#todos-panel webview');
+          if (webview) this.actions.todos.openDevTools();
         },
       });
     }
@@ -669,22 +683,32 @@ export default class FranzMenu {
       accelerator: `${cmdKey}+R`,
       click: () => {
         if (this.stores.user.isLoggedIn
-          && this.stores.services.enabled.length > 0) {
-          this.actions.service.reloadActive();
+        && this.stores.services.enabled.length > 0) {
+          if (this.stores.services.active.recipe.id === CUSTOM_WEBSITE_ID) {
+            this.stores.services.active.webview.reload();
+          } else {
+            this.actions.service.reloadActive();
+          }
         } else {
           window.location.reload();
         }
       },
     }, {
-        label: intl.formatMessage(menuItems.reloadFranz),
-        accelerator: `${cmdKey}+Shift+R`,
-        click: () => {
-          window.location.reload();
-        },
-      });
+      label: intl.formatMessage(menuItems.reloadFranz),
+      accelerator: `${cmdKey}+Shift+R`,
+      click: () => {
+        window.location.reload();
+      },
+    }, {
+      label: intl.formatMessage(menuItems.reloadTodos),
+      accelerator: `${cmdKey}+Shift+Alt+R`,
+      click: () => {
+        this.actions.todos.reload();
+      },
+    });
 
     tpl.unshift({
-      label: isMac ? app.getName() : intl.formatMessage(menuItems.file),
+      label: isMac ? app.name : intl.formatMessage(menuItems.file),
       submenu: [
         {
           label: intl.formatMessage(menuItems.about),
@@ -877,8 +901,22 @@ export default class FranzMenu {
       checked: service.isActive,
       click: () => {
         this.actions.service.setActive({ serviceId: service.id });
+
+        if (isMac && i === 0) {
+          app.mainWindow.restore();
+        }
       },
     })));
+
+    if (services.active && services.active.recipe.id === CUSTOM_WEBSITE_ID) {
+      menu.push({
+        type: 'separator',
+      }, {
+        label: intl.formatMessage(menuItems.serviceGoHome),
+        accelerator: `${cmdKey}+shift+H`,
+        click: () => this.actions.service.reloadActive(),
+      });
+    }
 
     return menu;
   }

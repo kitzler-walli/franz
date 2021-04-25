@@ -9,6 +9,7 @@ import injectSheet from 'react-jss';
 
 import ServiceView from './ServiceView';
 import Appear from '../../ui/effects/Appear';
+import { TODOS_RECIPE_ID } from '../../../features/todos';
 
 const messages = defineMessages({
   welcome: {
@@ -31,7 +32,7 @@ const styles = {
   },
 };
 
-export default @observer @injectSheet(styles) class Services extends Component {
+export default @injectSheet(styles) @observer class Services extends Component {
   static propTypes = {
     services: MobxPropTypes.arrayOrObservableArray,
     setWebviewReference: PropTypes.func.isRequired,
@@ -44,6 +45,7 @@ export default @observer @injectSheet(styles) class Services extends Component {
     userHasCompletedSignup: PropTypes.bool.isRequired,
     hasActivatedTrial: PropTypes.bool.isRequired,
     classes: PropTypes.object.isRequired,
+    isSpellcheckerEnabled: PropTypes.bool.isRequired,
   };
 
   static defaultProps = {
@@ -56,14 +58,22 @@ export default @observer @injectSheet(styles) class Services extends Component {
 
   state = {
     showConfetti: true,
-  }
+  };
+
+  _confettiTimeout = null;
 
   componentDidMount() {
-    window.setTimeout(() => {
+    this._confettiTimeout = window.setTimeout(() => {
       this.setState({
         showConfetti: false,
       });
     }, ms('8s'));
+  }
+
+  componentWillUnmount() {
+    if (this._confettiTimeout) {
+      clearTimeout(this._confettiTimeout);
+    }
   }
 
   render() {
@@ -79,6 +89,7 @@ export default @observer @injectSheet(styles) class Services extends Component {
       userHasCompletedSignup,
       hasActivatedTrial,
       classes,
+      isSpellcheckerEnabled,
     } = this.props;
 
     const {
@@ -117,7 +128,7 @@ export default @observer @injectSheet(styles) class Services extends Component {
             </div>
           </Appear>
         )}
-        {services.map(service => (
+        {services.filter(service => service.recipe.id !== TODOS_RECIPE_ID).map(service => (
           <ServiceView
             key={service.id}
             service={service}
@@ -135,6 +146,7 @@ export default @observer @injectSheet(styles) class Services extends Component {
               redirect: false,
             })}
             upgrade={() => openSettings({ path: 'user' })}
+            isSpellcheckerEnabled={isSpellcheckerEnabled}
           />
         ))}
       </div>
